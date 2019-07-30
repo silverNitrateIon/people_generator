@@ -16,21 +16,40 @@ class DataSynthesizer{
     
     std::default_random_engine gen{std::random_device{}()};
 
+    private:
+        int from_dist(int mean, int stDev, int max, int min){
+            std::normal_distribution<double> dist(mean, stDev), max(max), min(min);
+            int result = (int)dist(gen);
+            if (result < 0){
+                return (result * -1);
+            }
+            return result;
+        }
+
     public:
 
-        long int DebtGenerator(long int income){
-            long int maxVal, minVal;
-            long int mean = (long int)(income * 1.7);
-            std::normal_distribution<double> dist(mean, 100000);
-            long int debt = (long int)dist(gen);
+        double MarketParticipation(long int income){
+            return from_dist(100, 100, 0, 100);
+        }
+
+        int NumberOfChildern(){
+            return from_dist(2, 2, 0, 10);
+        }
+
+        int DebtGenerator(int income){
+            int maxVal, minVal;
+            int mean = (int)(income * 1.7);
+            int stDev = 100000;
+            std::normal_distribution<double> dist(mean, stDev);
+            int debt = (int)dist(gen);
             if (debt < 0){
                 debt = rand() % 1000;
             }
             return debt;
         }
 
-        long int IncomeGenerator(std::string gender, int age){
-            long int mean;
+        int IncomeGenerator(std::string gender, int age){
+            int mean;
             int stDev = 100000;
             if (gender == "F"){
                 mean = 32100;
@@ -38,7 +57,7 @@ class DataSynthesizer{
                 mean = 48100;
             }
             std::normal_distribution<double> dist(mean, stDev), min(1000), max(300000);
-            long int income = (long int)dist(gen);
+            int income = (int)dist(gen);
             if (income < 0){
                 income = income * -1;
             }
@@ -65,7 +84,7 @@ class DataSynthesizer{
             return age;
         }
 
-        std::string EmploymentGenerator(int roll, std::string gender, long int income){
+        std::string EmploymentGenerator(int roll, std::string gender, int income){
             if (income < 3000){
                 if ((gender == "M") && (roll >= 6.1)){
                     return "Y";
@@ -103,7 +122,7 @@ class DataStream{
             filestream << "Gender" << delim << "Age" << delim << "Employed" << delim << "Income" << delim << "Total Debt" << "\n";
         }
 
-        void Write(int age, long int income, std::string employment, std::string gender, long int debt){
+        void Write(int age, int income, std::string employment, std::string gender, int debt){
             if (age > 18){
                 filestream << gender << delim << age << delim << employment << delim << income << delim << debt << "\n";
             }
@@ -128,10 +147,10 @@ int main(int argc, char *argv[]){
         roll = rand() % 100;
         std::string gender = data.GenderGeneration(roll);
         int age = data.AgeGenerator(gender);
-        long int income = data.IncomeGenerator("F", age);
+        int income = data.IncomeGenerator("F", age);
         roll = rand() % 100;
         std::string emp = data.EmploymentGenerator(roll, gender, income);
-        long int debt = data.DebtGenerator(income);
+        int debt = data.DebtGenerator(income);
         std::cout << gender << " " << age << " " << income << " " << emp << " " << debt<< std::endl;
         file.Write(age, income, emp, gender, debt);
     }
